@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InstrumentController : MonoBehaviour
 {
     [SerializeField] private Slider timelineSlider;
-    [SerializeField] private Slider tempoSlider;
+    [SerializeField] private Slider bpmSlider;
+    [SerializeField] private TextMeshProUGUI bpmSlider_text;
     [SerializeField] private AudioSource source;
-    [SerializeField] private float tempo;
+    [SerializeField] private float bpm;
+    private float step;
 
     //beat bools
     private bool played_beat1;
@@ -32,19 +35,16 @@ public class InstrumentController : MonoBehaviour
     [SerializeField] private List<AudioClip> clips_beat3 = new List<AudioClip>();
     [SerializeField] private List<AudioClip> clips_beat4 = new List<AudioClip>();
 
-    private void Awake()
-    {
-        
-    }
-
     void Start()
     {
         ResetBools();
+        SetBPM();
     }
 
     void Update()
     {
-        timelineSlider.value += Time.deltaTime / tempo;
+        step = bpm / 60;
+        timelineSlider.value += step * Time.deltaTime;
 
         if (timelineSlider.value >= 1)
         {
@@ -86,9 +86,10 @@ public class InstrumentController : MonoBehaviour
         played_beat4 = false;
     }
 
-    public void SetTempo()
+    public void SetBPM()
     {
-        tempo = tempoSlider.value;
+        bpm = bpmSlider.value;
+        bpmSlider_text.text = bpm + " BPM";
     }
 
     private void PlayClips(List<AudioClip> list, Image ball)
