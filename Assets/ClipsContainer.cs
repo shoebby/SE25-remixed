@@ -19,7 +19,7 @@ public class ClipsContainer : MonoBehaviour
             GameObject newClipPrefab = Instantiate(clipPrefab, content);
             EntryContainer newPrefabScript = newClipPrefab.GetComponent<EntryContainer>();
             newPrefabScript.thisClip = clip;
-            newPrefabScript.clipName = clip.name;
+            newPrefabScript.clipName = "(" + clip.length.ToString().Substring(0,4) + " sec) " + clip.name;
         }
     }
 }
