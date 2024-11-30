@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,31 +12,53 @@ public class InstrumentController : MonoBehaviour
     [SerializeField] private AudioSource source;
     [SerializeField] private float bpm;
     private float step;
+    private float threshold;
+    private int nextBeat;
 
     //beat bools
-    private bool played_beat1;
-    private bool played_beat2;
-    private bool played_beat3;
-    private bool played_beat4;
+    private bool[] played_beats = new bool[16];
 
     [Header("Tick Balls")]
-    [SerializeField] private Image ball1;
-    [SerializeField] private Image ball2;
-    [SerializeField] private Image ball3;
-    [SerializeField] private Image ball4;
+    [SerializeField] private Image[] tickBalls = new Image[16];
     [SerializeField] private Color ball_defaultColor;
     [SerializeField] private Color ball_activeColor;
     [SerializeField] private float ball_waitTime;
 
     //beat clip lists
+    private List<AudioClip>[] beats_master;
+
     [SerializeField] private List<AudioClip> clips_beat1 = new List<AudioClip>();
     [SerializeField] private List<AudioClip> clips_beat2 = new List<AudioClip>();
     [SerializeField] private List<AudioClip> clips_beat3 = new List<AudioClip>();
     [SerializeField] private List<AudioClip> clips_beat4 = new List<AudioClip>();
 
+    [SerializeField] private List<AudioClip> clips_beat5 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat6 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat7 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat8 = new List<AudioClip>();
+
+    [SerializeField] private List<AudioClip> clips_beat9 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat10 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat11 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat12 = new List<AudioClip>();
+
+    [SerializeField] private List<AudioClip> clips_beat13 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat14 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat15 = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> clips_beat16 = new List<AudioClip>();
+
+    private void Awake()
+    {
+        beats_master = new List<AudioClip>[]
+        {
+            clips_beat1, clips_beat2, clips_beat3, clips_beat4, clips_beat5, clips_beat6, clips_beat7, clips_beat8, clips_beat9, clips_beat10, clips_beat11, clips_beat12,
+            clips_beat13, clips_beat14, clips_beat15, clips_beat16
+        };
+    }
+
     void Start()
     {
-        ResetBools();
+        ResetValues();
         SetBPM();
     }
 
@@ -46,44 +67,30 @@ public class InstrumentController : MonoBehaviour
         step = bpm / 60;
         timelineSlider.value += step * Time.deltaTime;
 
-        if (timelineSlider.value >= 1)
+        if (timelineSlider.value >= 4)
         {
-            timelineSlider.value = 0;
-            ResetBools();
-        }
-            
-
-        if (timelineSlider.value >= 0 && !played_beat1)
-        {
-            PlayClips(clips_beat1, ball1);
-            played_beat1 = true;
+            ResetValues();
         }
 
-        if (timelineSlider.value >= .25 && !played_beat2)
+        if (timelineSlider.value >= threshold && !played_beats[nextBeat])
         {
-            PlayClips(clips_beat2, ball2);
-            played_beat2 = true;
-        }
-
-        if (timelineSlider.value >= .5 && !played_beat3)
-        {
-            PlayClips(clips_beat3, ball3);
-            played_beat3 = true;
-        }
-
-        if (timelineSlider.value >= .75 && !played_beat4)
-        {
-            PlayClips(clips_beat4, ball4);
-            played_beat4 = true;
+            PlayClips(beats_master[nextBeat], tickBalls[nextBeat]);
+            played_beats[nextBeat] = true;
+            threshold += .25f;
+            nextBeat++;
         }
     }
 
-    private void ResetBools()
+    private void ResetValues()
     {
-        played_beat1 = false;
-        played_beat2 = false;
-        played_beat3 = false;
-        played_beat4 = false;
+        timelineSlider.value = 0f;
+        threshold = 0f;
+        nextBeat = 0;
+
+        for (int i = 0; i < played_beats.Length; i++)
+        {
+            played_beats[i] = false;
+        }
     }
 
     public void SetBPM()
@@ -111,25 +118,11 @@ public class InstrumentController : MonoBehaviour
 
     public void AddToBeat(int beat, AudioClip clip)
     {
-        if (beat == 1)
-            clips_beat1.Add(clip);
-        else if (beat == 2)
-            clips_beat2.Add(clip);
-        else if (beat == 3)
-            clips_beat3.Add(clip);
-        else if (beat == 4)
-            clips_beat4.Add(clip);
+        beats_master[beat - 1].Add(clip);
     }
 
     public void RemoveFromBeat(int beat, AudioClip clip)
     {
-        if (beat == 1)
-            clips_beat1.Remove(clip);
-        else if (beat == 2)
-            clips_beat2.Remove(clip);
-        else if (beat == 3)
-            clips_beat3.Remove(clip);
-        else if (beat == 4)
-            clips_beat4.Remove(clip);
+        beats_master[beat - 1].Remove(clip);
     }
 }
