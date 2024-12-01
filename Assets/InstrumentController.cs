@@ -11,6 +11,7 @@ public class InstrumentController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI bpmSlider_text;
     [SerializeField] private AudioSource source;
     [SerializeField] private float bpm;
+    [SerializeField] private TextMeshProUGUI secondPerBeatIndicator;
     private float step;
     private float threshold;
     private int nextBeat;
@@ -67,6 +68,8 @@ public class InstrumentController : MonoBehaviour
         step = bpm / 60;
         timelineSlider.value += step * Time.deltaTime;
 
+        secondPerBeatIndicator.text = "a beat is " + (60 / bpm).ToString() + " seconds \nthe bar is " + ((60 / bpm) * 4).ToString() + " seconds";
+
         if (timelineSlider.value >= 4)
         {
             ResetValues();
@@ -101,9 +104,12 @@ public class InstrumentController : MonoBehaviour
 
     private void PlayClips(List<AudioClip> list, Image ball)
     {        
-        foreach (AudioClip clip in list)
+        if (list.Count > 0)
         {
-            source.PlayOneShot(clip);
+            foreach (AudioClip clip in list)
+            {
+                source.PlayOneShot(clip);
+            }
         }
 
         StartCoroutine(FlashBall(ball));
